@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Example 2</title>
+  </head>
+  <style>
+    .container {
+      width: 800px;
+      padding: 20px;
+      box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    }
+
+    #price {
+      text-align: center;
+      color: #250979;
+    }
+  </style>
+  <body>
+    <div class="container">
+      <h2 id="price">$2600.00</h2>
+
+      <canvas id="myCanvas" width="800" height="450"></canvas>
+    </div>
+
+    <script>
+      const canvas = document.getElementById("myCanvas");
+      const ctx = canvas.getContext("2d");
+      const POINT_SIZE = 10;
+      const coordinates = [
+        { x: 20, y: 100 },
+        { x: 100, y: 20 },
+        { x: 150, y: 200 },
+        { x: 160, y: 50 },
+      ];
+
+      const coordinates2 = [
+        { x: 55, y: 158 },
+        { x: 134, y: 273 },
+        { x: 188, y: 80 },
+        { x: 307, y: 78 },
+      ];
+
+      const coordinates3 = [
+        { x: 315, y: 78 },
+        { x: 420, y: 70 },
+        { x: 390, y: 200 },
+        { x: 450, y: 50 },
+      ];
+
+      const coordinatesPoint = {
+        x: coordinates2[0].x,
+        y: coordinates2[0].y,
+      };
+
+      let movePoint = false;
+
+      canvas.addEventListener("mousemove", (event) => {
+        onMouseMove(canvas, event);
+      });
+
+      canvas.addEventListener("mousedown", (event) => {
+        onMouseDown(canvas, event);
+      });
+
+      canvas.addEventListener("mouseup", (e) => {
+        movePoint = false;
+      });
+
+      drawLines(ctx, [coordinates2, coordinates3]);
+      drawPoint(ctx, coordinatesPoint.x, coordinatesPoint.y);
+
+      function onMouseMove(canvas, event) {
+        const { xCursor, yCursor } = getMousePosition(canvas, event);
+        const isCursorOnPoint = getIsCursorOnPoint(canvas, event);
+        const trajectories = getTrajectories([coordinates2, coordinates3]);
+
+        if (isCursorOnPoint) {
+          canvas.style.cursor = "pointer";
+        } else {
+          canvas.style.cursor = "default";
+        }
+
+        if (movePoint) {
+          ctx.save();
+          trajectories.forEach((tr) => {
+            const isXPoint = xCursor >= tr.x - POINT_SIZE && xCursor <= tr.x + POINT_SIZE;
+            const isYPoint = yCursor >= tr.y - POINT_SIZE && yCursor <= tr.y + POINT_SIZE;
+            if (isXPoint && isYPoint) {
+              updateBalance(event);
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
+              drawLines(ctx, [coordinates2, coordinates3]);
+              coordinatesPoint.x = tr.x;
+              coordinatesPoint.y = tr.y;
+              drawPoint(ctx, coordinatesPoint.x, coordinatesPoint.y);
+            }
+          });
+          ctx.restore();
+        }
+      }
+
+      function updateBalance(event) {
+        const price = document.getElementById("price");
+        price.innerText = `$${((canvas.height - event.pageY) * 10.2).toFixed(2)}`;
+      }
+
+      function onMouseDown(canvas, event) {
+        const isCursorOnPoint = getIsCursorOnPoint(canvas, event);
+        if (isCursorOnPoint) {
+          movePoint = true;
+        }
+      }
+
+      function getIsCursorOnPoint(canvas, event) {
+        const { xCursor, yCursor } = getMousePosition(canvas, event);
+        const isXPoint =
+          xCursor >= coordinatesPoint.x - POINT_SIZE &&
+          xCursor <= coordinatesPoint.x + POINT_SIZE;
+        const isYPoint =
+          yCursor >= coordinatesPoint.y - POINT_SIZE &&
+          yCursor <= coordinatesPoint.y + POINT_SIZE;
+
+        return isXPoint && isYPoint;
+      }
+
+      function getMousePosition(canvas, event) {
+        const rect = canvas.getBoundingClientRect();
+        return {
+          xCursor: event.clientX - rect.left,
+          yCursor: event.clientY - rect.top,
+        };
+      }
+
+      function drawLines(ctx, [...coordinates]) {
+        const trajectories = getTrajectories(coordinates);
+        ctx.moveTo(trajectories[0].x, trajectories[0].y);
+        trajectories.forEach(({ x, y }) => {
+          ctx.lineTo(x, y);
+        });
+        const gradient = ctx.createLinearGradient(
+          trajectories[0].x,
+          trajectories[0].y,
+          trajectories[trajectories.length - 1].x,
+          trajectories[trajectories.length - 1].y
+        );
+
+        gradient.addColorStop("0", "#e6e5fb");
+        gradient.addColorStop("0.6", "#4e3c85");
+        gradient.addColorStop("0.7", "#250979");
+
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = gradient;
+        ctx.lineCap = "round";
+        ctx.stroke();
+      }
+
+      function getTrajectories(arrCoordinates) {
+        const coordinates = [];
+        arrCoordinates.forEach((arrCoordinate) => {
+          coordinates.push(...getBezierCoordinates(arrCoordinate));
+        });
+
+        return coordinates;
+      }
+
+      function getBezierCoordinates(coordinates) {
+        let accuracy = 0.01;
+        const arr = [];
+        for (let i = 0; i < 1; i += accuracy) {
+          const { x, y } = calcBezierCoordinates(i, coordinates);
+          arr.push({ x, y });
+        }
+
+        return arr;
+      }
+
+      function calcBezierCoordinates(t, coordinates) {
+        const [p0, p1, p2, p3] = coordinates;
+        const cX = 3 * (p1.x - p0.x);
+        const bX = 3 * (p2.x - p1.x) - cX;
+        const aX = p3.x - p0.x - cX - bX;
+
+        const cY = 3 * (p1.y - p0.y);
+        const bY = 3 * (p2.y - p1.y) - cY;
+        const aY = p3.y - p0.y - cY - bY;
+
+        const x = aX * Math.pow(t, 3) + bX * Math.pow(t, 2) + cX * t + p0.x;
+        const y = aY * Math.pow(t, 3) + bY * Math.pow(t, 2) + cY * t + p0.y;
+
+        return { x, y };
+      }
+
+      function drawPoint(ctx, x, y) {
+        ctx.save();
+        ctx.beginPath();
+
+        ctx.arc(x, y, POINT_SIZE - 2, 0, 2 * Math.PI);
+        ctx.fillStyle = "#4e3c85";
+
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      }
+    </script>
+  </body>
+</html>

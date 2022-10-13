@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Example 1</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+  </head>
+  <body>
+    <div>
+      <canvas id="myChart" width="400" height="100"></canvas>
+    </div>
+    <script>
+      const labels = ["12am", "3am", "6am", "9am", "12pm", "3pm", "6pm"];
+
+      const data = {
+        labels: labels,
+        datasets: [
+          {
+            borderColor: "#ceb8d1",
+            data: [],
+          },
+          {
+            borderColor: "#a0d888",
+            data: [],
+          },
+        ],
+      };
+
+      const config = {
+        type: "line",
+        data,
+        options: {
+          scales: {
+            x: {
+              grid: {
+                display: false,
+              },
+            },
+            y: {
+              grid: {
+                display: false,
+              },
+              min: 0,
+              ticks: {
+                callback: function (value, index) {
+                  if (index % 2 === 0) {
+                    return value;
+                  }
+                },
+              },
+            },
+          },
+          tension: 0.5,
+          elements: {
+            point: {
+              radius: 0,
+            },
+          },
+          responsive: true,
+          layout: {
+            padding: 20,
+          },
+          plugins: {
+            legend: {
+              display: false,
+            },
+          },
+        },
+      };
+      const myChart = new Chart(document.getElementById("myChart"), config);
+      const data1 = [44, 21, 77, 50, 30, 18, 21];
+      const data2 = [32, 55, 15, 43, 20, 30, 40];
+
+      for (let i = 0; i < data1.length; i++) {
+        setTimeout(() => {
+          console.log(i);
+          myChart.data.datasets[0].data.push(data1[i]);
+          myChart.data.datasets[1].data.push(data2[i]);
+          myChart.update();
+        }, i * 150);
+      }
+    </script>
+  </body>
+</html>

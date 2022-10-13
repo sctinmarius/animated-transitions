@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>iframe</title>
+    <style>
+      :root {
+        padding-top: 18px;
+        font-family: Arial, Helvetica, sans-serif;
+        color: #333;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      .flex-container-primary {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+      }
+
+      .flex-container-second {
+        display: flex;
+        flex-direction: row;
+      }
+
+      img {
+        width: 30%;
+        height: auto;
+      }
+
+      .container-body {
+        background-color: #fff;
+        border-radius: 15px;
+        padding-top: 20px;
+        position: relative;
+        animation: containerBody 1.6s 1;
+      }
+
+      @keyframes containerBody {
+        from {
+          top: 100px;
+        }
+        to {
+          top: 0;
+        }
+      }
+
+      .container-head {
+        padding-bottom: 20px;
+      }
+
+      .subtitle {
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: rgb(143, 141, 141);
+      }
+
+      .avatar {
+        vertical-align: middle;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        box-shadow: 0 4px 2px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      }
+
+      .animateCounter {
+        font-size: 0.8rem;
+        font-weight: 700;
+      }
+
+      .animateCounter::after {
+        content: counter(count);
+        animation: counter 2s linear;
+        counter-reset: count 621;
+      }
+
+      @keyframes counter {
+        10% {
+          counter-increment: count 1;
+        }
+        20% {
+          counter-increment: count 30;
+        }
+        30% {
+          counter-increment: count 38;
+        }
+        40% {
+          counter-increment: count 44;
+        }
+        50% {
+          counter-increment: count 57;
+        }
+        60% {
+          counter-increment: count 60;
+        }
+        70% {
+          counter-increment: count 70;
+        }
+        80% {
+          counter-increment: count 88;
+        }
+        90% {
+          counter-increment: count 91;
+        }
+        100% {
+          counter-increment: count 92;
+        }
+      }
+
+      .percentage {
+        color: rgb(93, 125, 230);
+        font-size: 0.7rem;
+      }
+
+      .percentage::before {
+        content: " \25E5";
+      }
+    </style>
+    <script
+      type="text/javascript"
+      src="https://www.gstatic.com/charts/loader.js"
+    ></script>
+    <script type="text/javascript">
+      google.charts.load("current", { packages: ["corechart"] });
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ["Task", "Hours per Day"],
+          ["Work", 11],
+          ["Eat", 2],
+          ["Commute", 2],
+          ["Watch TV", 2],
+          ["Sleep", 7],
+        ]);
+
+        var options = {
+          animation: {
+            duration: 1000,
+            easing: "out",
+          },
+          is3D: true,
+        };
+
+        var chart = new google.visualization.PieChart(
+          document.getElementById("piechart_3d")
+        );
+        chart.draw(data, options);
+      }
+    </script>
+  </head>
+  <body>
+    <div class="container-head">
+      <div class="flex-container-primary">
+        <div>
+          <span class="subtitle">$</span> <span class="animateCounter">120 831 </span
+          ><br />
+          <span class="percentage">7.2%</span
+          ><span class="subtitle">&nbsp; - &nbsp; $ 2.391.200</span>
+        </div>
+        <div><img src="imgs/img_avatar.png" alt="Avatar" class="avatar" /></div>
+      </div>
+    </div>
+
+    <div class="container-body">
+      <div class="flex-container-second">
+        <div>
+          <img src="imgs/suitcase.png" />
+          <h4>Portofolio rebalancing</h4>
+          <p class="subtitle">Yeld 8%</p>
+        </div>
+
+        <div>
+          <img src="imgs/building.png" />
+          <h4>Private Sharing Apartments</h4>
+          <p class="subtitle">Income up to 2 milion $</p>
+        </div>
+      </div>
+
+      <h4>Investiment portofolio allocation</h4>
+      <div id="piechart_3d" style="width: 100%"></div>
+    </div>
+  </body>
+</html>
